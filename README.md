@@ -16,3 +16,8 @@ install.packages(c("tidyverse", "chilemapas", "readxl", "sf", "RColorBrewer", "g
 ```
 
 ![](plt3.jpg)
+
+## 📚 Bibliografía y Fuentes
+
+- Comisión Chilena del Cobre (Cochilco), sección Estadistícas > Base de Datos Electrónica (BDE) https://www.cochilco.cl
+- Pebesma, E. Bivand, R. Spatial Data Science with Applications in R 
