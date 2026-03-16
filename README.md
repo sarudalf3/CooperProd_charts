@@ -12,14 +12,13 @@ Este proyecto utiliza **R** y librerías espaciales (`sf`, `chilemapas`) para vi
 Es necesario tener instaladas las siguientes librerías en R:
 
 ```r
-install.packages(c("tidyverse", "chilemapas", "readxl", "sf", "RColorBrewer", "ggrepel"))
+install.packages(c("tidyverse", "chilemapas", "readxl", "sf", "RColorBrewer", "ggrepel",
+"cowplot", "magick"))
 ```
-
-![](plt3.jpg)
 
 ## 📚 Bibliografía y Fuentes
 
 - Comisión Chilena del Cobre (Cochilco), sección Estadistícas > Base de Datos Electrónica (BDE) https://www.cochilco.cl
 - Pebesma, E. Bivand, R. Spatial Data Science with Applications in R https://r-spatial.org/book/
 
-### Visita mi website github https://sarudalf3.github.io/
+### Revisa mi [github website](https://sarudalf3.github.io/about/) para mayor información acerca de mi.
