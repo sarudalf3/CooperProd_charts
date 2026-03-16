@@ -4,29 +4,31 @@ library(readxl)
 library(sf)
 library(RColorBrewer) # Para paletas neutrales
 library(ggrepel)
+library(cowplot)
+library(magick)
 
 # 1. Cargar la data consolidada de Cochilco y nuestras coordenadas
-data_raw <- read_excel("ChileChart/Chile_Cooper_Prod.xls", skip = 2) %>%
+data_raw <- read_excel("Chile_Cooper_Prod.xls", skip = 2) %>%
   pivot_longer(cols=-1, names_to='yacimiento', values_to='prod') %>%
   mutate(Code = yacimiento |> recode_values(
-            "Codelco - Gaby" ~ "GABY",
+            "Codelco - Gaby" ~ "GM",
             "Codelco - Salvador" ~"SALV",
             "Codelco - Chuqui, RT y MH" ~ "COD_CHUQ",
-            "Escondida" ~ "ESC",                                        
+            "Escondida" ~ "ESCOND",                                        
             "Collahuasi" ~ "COLLAH",
-            "Zaldivar" ~ "CMZ",
+            "Zaldivar" ~ "ZALD",
             "El Abra" ~ "ABRA",
             "Candelaria" ~ "CANDEL",
             "Cerro Colorado" ~ "CC",
             "El Tesoro" ~ "CENT",
             "Quebrada Blanca" ~ "QB",
-            "Lomas Bayas" ~ "LB",
+            "Lomas Bayas" ~ "LOM_BAY",
             "Esperanza" ~ "CENT", 
             "Spence" ~ "SPENCE")) %>%
   filter(!is.na(Code))
 
 
-minner <- read_excel("ChileChart/Cooper_Minners.xlsx") %>%
+minner <- read_excel("Cooper_Minners.xlsx") %>%
   st_as_sf(coords = c("Longitud", "Latitud"), 
     crs = 4326)  # Sistema WGS84
 
@@ -65,7 +67,8 @@ plt1 <- ggplot() +
   theme(
     panel.background = element_rect(fill = "white", color = NA),
     legend.position = "right",
-    axis.text = element_text(size = 8, color = "grey60")
+    axis.text = element_text(size = 8, color = "grey60"),
+    plot.caption = element_text(hjust = 0, size = 9, color = "grey30", face = "italic")
   ) +
   labs(
     title = "Operaciones Mineras Zona Norte - Chile",
@@ -76,8 +79,7 @@ plt1 <- ggplot() +
     caption = "Fuente: Elaboración propia."
   )
 
-
-##Calculate new points in Codelco CHUQ (CHUQ, MH, RT) y Centinela (TESOR, ESPZ)
+##Calcular nuevos puntos en Codelco CHUQ (CHUQ, MH, RT) y Centinela (TESOR, ESPZ)
 cent_code <- minner %>%
   group_by(Code) %>% 
   summarise(geometry = st_union(geometry)) %>% # Une los puntos que comparten el mismo código
@@ -118,7 +120,8 @@ plt2 <- ggplot() +
   theme(
     panel.background = element_rect(fill = "white", color = NA),
     legend.position = "right",
-    axis.text = element_text(size = 8, color = "grey60")
+    axis.text = element_text(size = 8, color = "grey60"),
+    plot.caption = element_text(hjust = 0, size = 9, color = "grey30", face = "italic")
   ) +
   labs(
     title = "Operaciones Mineras Zona Norte - Chile",
@@ -158,7 +161,7 @@ plt3 <-  ggplot() +
   
   # Ajuste de ancho de ejes (más espacio a los costados)
   coord_sf(xlim = c(-74, -66)) + 
-  scale_size_continuous(range = c(2, 9), name = "Producción año 2025") +
+  scale_size_continuous(range = c(2, 9), name = "Producción año 2025 (kT)") +
   # Escala de colores neutrales
   scale_fill_brewer(palette = "Paired") + 
   
@@ -170,17 +173,34 @@ plt3 <-  ggplot() +
     panel.background = element_rect(
       fill = "white", color = NA),
     legend.position = "right",
-    axis.text = element_text(size = 10, color = "grey50")
+    axis.text = element_text(size = 10, color = "grey50"),
+    plot.caption = element_text(hjust = 0, size = 9, color = "grey30", face = "italic")
   ) +
   labs(
     title = "Operaciones Mineras Zona Norte - Chile",
-    subtitle = "Producción Cu año 2025 (kMT)",
+    subtitle = "Producción Cu año 2025 (kT / miles de toneladas métricas)",
     fill = "Operadores",
-    caption = "Fuente: Elaboración propia basada en datos de Cochilco. \nNota: COD_CHUQ incluye CHUQ, RT y MH. \nNota: CENT incluye ESPEZ y TESOR",
+    caption = "Fuente: Elaboración propia basada en datos de Cochilco. \nNota: COD_CHUQ incluye CHUQ, RT y MH.",
     x = "Longitud", 
     y = "Latitud"
   )
 
-ggsave(filename = "ChileChart/plt1.jpg", plot = plt1)
-ggsave(filename = "ChileChart/plt2.jpg", plot = plt2)
-ggsave(filename = "ChileChart/plt3.jpg", plot = plt3)
+#Insert watermarks
+
+watermark <- magick::image_read("github_sign.png") %>%
+  magick::image_colorize(opacity = 70, color = "white") 
+
+cfg_watermark <- draw_image(watermark, 
+  x = 0.8,  y = 0.07,
+  scale = 0.13,
+  hjust = 0.52, vjust = 0.48
+)
+
+plt1_a <- ggdraw(plt1) + cfg_watermark
+plt2_a <- ggdraw(plt2) + cfg_watermark
+plt3_a <- ggdraw(plt3) + cfg_watermark
+
+#Guardar graficos
+ggsave(filename = "plt1.jpg", plot = plt1_a, bg = "gray95", width = 8, height = 6)
+ggsave(filename = "plt2.jpg", plot = plt2_a, bg = "gray95", width = 8, height = 6)
+ggsave(filename = "plt3.jpg", plot = plt3_a, bg = "gray95", width = 8, height = 6)

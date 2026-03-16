@@ -21,3 +21,5 @@ install.packages(c("tidyverse", "chilemapas", "readxl", "sf", "RColorBrewer", "g
 
 - Comisión Chilena del Cobre (Cochilco), sección Estadistícas > Base de Datos Electrónica (BDE) https://www.cochilco.cl
 - Pebesma, E. Bivand, R. Spatial Data Science with Applications in R https://r-spatial.org/book/
+
+### Visita mi website github https://sarudalf3.github.io/
